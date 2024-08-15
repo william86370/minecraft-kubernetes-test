@@ -1,0 +1,73 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecraft-server
+  namespace: minecraft-server
+spec:
+  selector:
+    matchLabels:
+      app: minecraft-server
+  template:
+    metadata:
+      labels:
+        app: minecraft-server
+    spec:
+      containers:
+      - name: browser
+        image: filebrowser/filebrowser
+        ports:
+          - containerPort: 80
+            name: http
+        volumeMounts:
+          - name: minecraft-pvc
+            mountPath: /srv
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 250Mi
+      - image: itzg/minecraft-server
+        name: minecraft-server
+        env:
+          # Use secret in real usage
+        - name: EULA
+          value: "true"
+        - name: TYPE
+          value: "PAPER"
+        - name: VIEW_DISTANCE
+          value: "12"
+        - name: MEMORY
+          value: "6G"
+        - name: CONSOLE
+          value: "true"
+        - name: MOTD
+          value: 'Dedicated-Server'
+        - name: DIFFICULTY
+          value: normal
+        ports:
+        - containerPort: 25565
+          name: minecraft
+        readinessProbe:
+          exec:
+            command:
+            - mcstatus
+            - localhost
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - mcstatus
+            - localhost
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - mountPath: /data
+          name: minecraft-server
+        resources: {}
+      volumes:
+      - name: minecraft-server
+        persistentVolumeClaim:
+          claimName: minecraft-server

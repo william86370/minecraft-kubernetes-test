@@ -8,9 +8,9 @@ spec:
   ports:
     - name: minecraft
       port: 25565
-      targetPort: 25565
+      nodePort: 30000
     - name: http
+      nodePort: 30001
       port: 80
-      targetPort: 80
   selector:
     app: minecraft-server

@@ -20,7 +20,7 @@ spec:
           - containerPort: 80
             name: http
         volumeMounts:
-          - name: minecraft-pvc
+          - name: minecraft-server
             mountPath: /srv
         resources:
           limits:
